@@ -325,9 +325,9 @@ window.startVideoCall = function(roomName, userName) {
 
     api = new JitsiMeetExternalAPI(domain, options);
     
-    api.addEventListeners({
-        videoConferenceLeft: function () { endVideoCall(); }
-    });
+    // api.addEventListeners({
+    //     videoConferenceLeft: function () { endVideoCall(); }
+    // });
 }
 
 window.endVideoCall = function() {
