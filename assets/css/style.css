@@ -1,0 +1,154 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+
+/* =========================================
+   GLOBAL STYLES
+   ========================================= */
+body {
+    font-family: 'Inter', sans-serif;
+}
+
+/* --- Loader & Transitions --- */
+.fade-out {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.fade-in {
+    animation: fadeIn 0.5s ease-in-out forwards;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* --- Blob Animation (Login Background) --- */
+@keyframes blob {
+    0% { transform: translate(0px, 0px) scale(1); }
+    33% { transform: translate(30px, -50px) scale(1.1); }
+    66% { transform: translate(-20px, 20px) scale(0.9); }
+    100% { transform: translate(0px, 0px) scale(1); }
+}
+
+.animate-blob {
+    animation: blob 7s infinite;
+}
+
+.animation-delay-2000 {
+    animation-delay: 2s;
+}
+
+/* --- Custom Scrollbar --- */
+.custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background-color: #cbd5e1;
+    border-radius: 20px;
+}
+
+.dark .custom-scrollbar::-webkit-scrollbar-thumb {
+    background-color: #4b5563;
+}
+
+/* --- Sidebar Transition --- */
+#sidebar {
+    transition: width 0.3s ease-in-out, transform 0.3s ease-in-out, opacity 0.2s ease;
+}
+
+/* Glass effect for mobile overlay */
+.glass-effect {
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+}
+
+/* =========================================
+   GAME STYLES (Zen Zone)
+   ========================================= */
+
+/* Glass Container for the Game */
+.zen-container {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+    /* Handles smooth theme color switching */
+    transition: background 1s ease-in-out; 
+}
+
+.dark .zen-container {
+    background: rgba(17, 24, 39, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* The Breathing Circle */
+.breathe-circle {
+    box-shadow: 0 0 30px rgba(99, 102, 241, 0.4);
+    transition: transform 4s cubic-bezier(0.4, 0, 0.2, 1), background-color 1s ease, box-shadow 1s ease;
+}
+
+/* Game Card Styles (Memory Game) */
+.game-card {
+    aspect-ratio: 1;
+    border-radius: 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    transition: transform 0.2s, background-color 0.2s;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    border: 2px solid transparent;
+}
+
+/* Breathing Animation States */
+.state-inhale {
+    transition: transform 4s cubic-bezier(0.4, 0, 0.2, 1); 
+}
+
+.state-hold {
+    /* FIXED: Added property to remove empty rule warning */
+    transform: scale(1.5); 
+}
+
+.state-exhale {
+    transition: transform 8s cubic-bezier(0.4, 0, 0.2, 1); 
+}
+
+/* Text Fade Effect */
+.fade-text {
+    animation: textFade 2s infinite alternate;
+}
+
+@keyframes textFade {
+    0% { opacity: 0.8; }
+    100% { opacity: 1; text-shadow: 0 0 10px rgba(255,255,255,0.5); }
+}
+
+/* Tooltip for Theme Buttons */
+.tooltip {
+    position: relative;
+}
+
+.tooltip:hover::after {
+    content: attr(title);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(0,0,0,0.8);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    white-space: nowrap;
+    margin-bottom: 5px;
+    pointer-events: none;
+    opacity: 0;
+    animation: fadeIn 0.2s forwards;
+}

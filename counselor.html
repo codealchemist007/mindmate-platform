@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MindMate - Pro Portal</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src='https://meet.jit.si/external_api.js'></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: { 
+                extend: { 
+                    colors: { 
+                        medical: { light: '#6ee7b7', DEFAULT: '#10b981', dark: '#047857' },
+                        brand: { DEFAULT: '#6366f1' }
+                    },
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    animation: {
+                        'fade-in': 'fadeIn 0.5s ease-out',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0', transform: 'translateY(10px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        }
+                    }
+                } 
+            }
+        }
+    </script>
+    
+    <style>
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 20px; }
+        .dark .custom-scrollbar::-webkit-scrollbar-thumb { background-color: #475569; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 dark:bg-gray-900 dark:text-gray-100 font-sans overflow-hidden transition-colors duration-300">
+
+    <div class="flex h-screen relative">
+        
+        <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-64 bg-white dark:bg-gray-800 shadow-2xl transform -translate-x-full md:translate-x-0 md:relative md:flex flex-col h-full transition-transform duration-300 ease-in-out border-r border-gray-100 dark:border-gray-700">
+            
+            <div class="p-6 h-20 flex items-center justify-between border-b border-gray-100 dark:border-gray-700 shrink-0">
+                <div class="flex items-center">
+                    <div class="bg-medical/10 p-2 rounded-lg mr-3">
+                        <i class="fas fa-user-md text-medical text-xl"></i>
+                    </div>
+                    <span class="text-xl font-bold text-gray-800 dark:text-white">MindMate<span class="text-medical">Pro</span></span>
+                </div>
+                <button id="closeSidebar" class="md:hidden text-gray-500 hover:text-red-500 dark:text-gray-400 transition"><i class="fas fa-times text-xl"></i></button>
+            </div>
+            
+            <div class="flex-1 overflow-y-auto custom-scrollbar py-6 px-4 space-y-2">
+                <button onclick="switchTab('overview')" id="btn-overview" class="nav-btn w-full flex items-center p-3 rounded-lg text-medical bg-emerald-50 dark:bg-gray-700 font-bold border-r-4 border-medical transition-all">
+                    <i class="fas fa-chart-line w-6"></i> <span class="ml-3">Dashboard</span>
+                </button>
+                <button onclick="switchTab('requests')" id="btn-requests" class="nav-btn w-full flex items-center p-3 rounded-lg text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700 transition-all">
+                    <i class="fas fa-inbox w-6"></i> <span class="ml-3">Requests</span>
+                    <span id="sidebarRequestBadge" class="ml-auto bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full hidden">0</span>
+                </button>
+                <button onclick="switchTab('patients')" id="btn-patients" class="nav-btn w-full flex items-center p-3 rounded-lg text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700 transition-all">
+                    <i class="fas fa-users w-6"></i> <span class="ml-3">My Patients</span>
+                </button>
+                <button onclick="switchTab('schedule')" id="btn-schedule" class="nav-btn w-full flex items-center p-3 rounded-lg text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700 transition-all">
+                    <i class="fas fa-calendar-check w-6"></i> <span class="ml-3">Schedule</span>
+                </button>
+                <button onclick="switchTab('profile')" id="btn-profile" class="nav-btn w-full flex items-center p-3 rounded-lg text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700 transition-all">
+                    <i class="fas fa-id-badge w-6"></i> <span class="ml-3">My Profile</span>
+                </button>
+            </div>
+
+            <div class="p-4 border-t border-gray-100 dark:border-gray-700 space-y-2 shrink-0 bg-white dark:bg-gray-800">
+                <button id="themeToggle" class="w-full p-2 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-200 rounded-lg flex items-center justify-center transition hover:bg-gray-200 dark:hover:bg-gray-600">
+                    <i class="fas fa-moon mr-2"></i> Dark Mode
+                </button>
+                <a href="index.html" class="w-full p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg flex items-center justify-center transition">
+                    <i class="fas fa-sign-out-alt mr-2"></i> Logout
+                </a>
+            </div>
+        </aside>
+
+        <div class="flex-1 flex flex-col h-screen overflow-hidden bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
+            
+            <header class="bg-white dark:bg-gray-800 h-16 shadow-sm flex justify-between items-center px-6 z-10 shrink-0 relative">
+                <div class="flex items-center">
+                    <button id="toggleSidebar" class="text-gray-600 dark:text-white text-2xl mr-4 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition focus:outline-none">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h2 class="text-lg font-bold text-gray-700 dark:text-white" id="pageTitle">Overview</h2>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <div class="hidden sm:flex items-center bg-green-100 dark:bg-green-900/30 px-3 py-1 rounded-full border border-green-200 dark:border-green-800">
+                        <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse mr-2"></span>
+                        <span class="text-xs font-bold text-green-700 dark:text-green-400">Online</span>
+                    </div>
+                    <div class="flex items-center cursor-pointer">
+                        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=DrSmith" class="w-9 h-9 rounded-full bg-gray-100 border-2 border-white shadow-sm">
+                        <span id="headerName" class="ml-2 text-sm font-bold text-gray-700 dark:text-gray-200 hidden md:block">Dr. Smith</span>
+                    </div>
+                </div>
+            </header>
+
+            <main class="flex-1 overflow-y-auto p-6 custom-scrollbar scroll-smooth relative">
+                
+                <div id="tab-overview" class="tab-content animate-fade-in space-y-8">
+                    
+                    <div class="bg-gradient-to-r from-medical to-teal-600 rounded-2xl p-8 text-white shadow-lg relative overflow-hidden">
+                        <div class="absolute right-0 top-0 h-full w-1/3 bg-white/10 skew-x-12 translate-x-12 pointer-events-none"></div>
+                        <div class="relative z-10">
+                            <h2 class="text-3xl font-bold mb-2">Good Morning, <span id="welcomeName">Doctor</span>!</h2>
+                            <p class="text-white/90 text-sm opacity-90" id="currentDateDisplay">Loading date...</p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-md transition">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <p class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Total Patients</p>
+                                    <h3 id="statPatients" class="text-3xl font-bold text-gray-800 dark:text-white mt-2">0</h3>
+                                </div>
+                                <div class="p-3 bg-blue-50 dark:bg-blue-900/20 text-blue-600 rounded-lg">
+                                    <i class="fas fa-users text-xl"></i>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-md transition">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <p class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Pending Requests</p>
+                                    <h3 id="statRequests" class="text-3xl font-bold text-gray-800 dark:text-white mt-2">0</h3>
+                                </div>
+                                <div class="p-3 bg-yellow-50 dark:bg-yellow-900/20 text-yellow-600 rounded-lg">
+                                    <i class="fas fa-clock text-xl"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-md transition">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <p class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Upcoming Sessions</p>
+                                    <h3 id="statSessions" class="text-3xl font-bold text-gray-800 dark:text-white mt-2">0</h3>
+                                </div>
+                                <div class="p-3 bg-purple-50 dark:bg-purple-900/20 text-purple-600 rounded-lg">
+                                    <i class="fas fa-video text-xl"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        
+                        <div class="lg:col-span-2 space-y-4">
+                            <div class="flex justify-between items-center">
+                                <h3 class="font-bold text-xl text-gray-800 dark:text-white">Today's Schedule</h3>
+                                <button onclick="switchTab('schedule')" class="text-sm text-medical font-bold hover:underline">View Calendar</button>
+                            </div>
+                            
+                            <div id="todayScheduleContainer" class="space-y-3">
+                                <div class="text-center py-10 text-gray-400 bg-white dark:bg-gray-800 rounded-xl border border-dashed border-gray-200 dark:border-gray-700">
+                                    <i class="fas fa-coffee text-2xl mb-2"></i>
+                                    <p>No sessions scheduled for today.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="space-y-4">
+                            <h3 class="font-bold text-xl text-gray-800 dark:text-white">Quick Actions</h3>
+                            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-4 space-y-2">
+                                
+                                <button onclick="switchTab('requests')" class="w-full flex items-center p-3 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition group">
+                                    <div class="bg-blue-100 text-blue-600 w-10 h-10 rounded-lg flex items-center justify-center mr-4 group-hover:scale-110 transition">
+                                        <i class="fas fa-user-plus"></i>
+                                    </div>
+                                    <div class="text-left">
+                                        <p class="font-bold text-gray-800 dark:text-white text-sm">Review Requests</p>
+                                        <p class="text-xs text-gray-500">Check pending applications</p>
+                                    </div>
+                                </button>
+
+                                <button onclick="switchTab('profile')" class="w-full flex items-center p-3 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition group">
+                                    <div class="bg-green-100 text-green-600 w-10 h-10 rounded-lg flex items-center justify-center mr-4 group-hover:scale-110 transition">
+                                        <i class="fas fa-edit"></i>
+                                    </div>
+                                    <div class="text-left">
+                                        <p class="font-bold text-gray-800 dark:text-white text-sm">Update Profile</p>
+                                        <p class="text-xs text-gray-500">Change availability & bio</p>
+                                    </div>
+                                </button>
+
+                                <button onclick="alert('Feature coming soon: Export Data')" class="w-full flex items-center p-3 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition group">
+                                    <div class="bg-orange-100 text-orange-600 w-10 h-10 rounded-lg flex items-center justify-center mr-4 group-hover:scale-110 transition">
+                                        <i class="fas fa-file-export"></i>
+                                    </div>
+                                    <div class="text-left">
+                                        <p class="font-bold text-gray-800 dark:text-white text-sm">Export Reports</p>
+                                        <p class="text-xs text-gray-500">Download session history</p>
+                                    </div>
+                                </button>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tab-requests" class="tab-content hidden animate-fade-in">
+                    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col">
+                        <div class="p-6 border-b border-gray-100 dark:border-gray-700 flex justify-between">
+                            <h3 class="font-bold text-lg text-gray-800 dark:text-white">Incoming Requests</h3>
+                            <button onclick="fetchDashboardData()" class="text-medical text-sm font-bold hover:underline"><i class="fas fa-sync-alt"></i> Refresh</button>
+                        </div>
+                        <div id="requestsContainer" class="p-6 space-y-4">
+                            <div class="text-center py-8 text-gray-400">
+                                <i class="fas fa-circle-notch fa-spin text-2xl"></i>
+                                <p class="mt-2">Loading requests...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tab-patients" class="tab-content hidden animate-fade-in w-full">
+                    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 w-full h-full">
+                        <div class="flex justify-between items-center mb-6 border-b border-gray-100 dark:border-gray-700 pb-4">
+                            <h3 class="font-bold text-xl text-gray-800 dark:text-white">Patient Directory</h3>
+                            <span class="bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-xs font-bold">Active Patients</span>
+                        </div>
+                        <div id="patientsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            <div class="col-span-full text-center text-gray-400 py-10">Loading patients...</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tab-schedule" class="tab-content hidden animate-fade-in w-full">
+                    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 w-full">
+                        <div class="flex justify-between items-center mb-6 border-b border-gray-100 dark:border-gray-700 pb-4">
+                            <h3 class="font-bold text-xl text-gray-800 dark:text-white">Upcoming Sessions</h3>
+                            <button class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-bold shadow transition">
+                                <i class="fas fa-plus mr-2"></i> Add Session
+                            </button>
+                        </div>
+                        <div id="scheduleContainer" class="space-y-4 w-full">
+                            <div class="text-center text-gray-400 py-10">Loading schedule...</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tab-profile" class="tab-content hidden fade-in w-full h-full p-6">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 h-full max-w-6xl mx-auto">
+                        
+                        <div class="md:col-span-1 bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 p-6 flex flex-col items-center justify-center text-center">
+                            <div class="relative mb-6 group">
+                                <img id="profileAvatar" src="https://api.dicebear.com/7.x/avataaars/svg?seed=DrSmith" 
+                                     class="w-40 h-40 rounded-full border-4 border-white dark:border-gray-700 shadow-xl bg-gray-50 object-cover">
+                                <button onclick="randomizeAvatar()" class="absolute bottom-2 right-2 bg-medical hover:bg-green-700 text-white p-3 rounded-full shadow-lg transition transform hover:scale-110" title="Generate New Look">
+                                    <i class="fas fa-magic"></i>
+                                </button>
+                            </div>
+                            <h2 id="profileNameDisplay" class="text-2xl font-bold text-gray-800 dark:text-white mb-1">Dr. Counselor</h2>
+                            <p class="text-medical font-bold text-sm uppercase tracking-wide mb-6">License #8976-X</p>
+                            <div class="flex items-center justify-center space-x-3 bg-gray-50 dark:bg-gray-700/50 p-3 rounded-full w-full">
+                                <span class="relative flex h-3 w-3">
+                                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                                  <span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+                                </span>
+                                <span class="text-sm font-bold text-gray-600 dark:text-gray-300">Available</span>
+                            </div>
+                        </div>
+
+                        <div class="md:col-span-2 bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 p-8">
+                            <div class="flex justify-between items-center mb-6 border-b border-gray-100 dark:border-gray-700 pb-4">
+                                <h3 class="text-xl font-bold text-gray-800 dark:text-white"><i class="fas fa-user-md mr-2 text-medical"></i> Professional Profile</h3>
+                            </div>
+
+                            <form onsubmit="event.preventDefault(); saveProfile();">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
+                                    <div>
+                                        <label class="text-xs font-bold text-gray-500 uppercase mb-1 block">Full Name & Title</label>
+                                        <input id="profileNameInput" type="text" class="w-full p-3 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600 outline-none focus:ring-2 focus:ring-medical dark:text-white text-sm" placeholder="Dr. Jane Doe">
+                                    </div>
+                                    <div>
+                                        <label class="text-xs font-bold text-gray-500 uppercase mb-1 block">Specialization</label>
+                                        <select id="inpSpecialization" class="w-full p-3 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600 outline-none focus:ring-2 focus:ring-medical dark:text-white text-sm">
+                                            <option>Clinical Psychology</option>
+                                            <option>Cognitive Behavioral Therapy</option>
+                                            <option>Student Counseling</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="text-xs font-bold text-gray-500 uppercase mb-1 block">Email</label>
+                                        <input id="inpEmail" type="email" class="w-full p-3 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600 outline-none focus:ring-2 focus:ring-medical dark:text-white text-sm" value="doctor@mindmate.com">
+                                    </div>
+                                    <div>
+                                        <label class="text-xs font-bold text-gray-500 uppercase mb-1 block">Experience (Years)</label>
+                                        <input id="inpExp" type="number" class="w-full p-3 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600 outline-none focus:ring-2 focus:ring-medical dark:text-white text-sm" placeholder="Ex: 5">
+                                    </div>
+                                </div>
+                                <div class="mb-6">
+                                    <label class="text-xs font-bold text-gray-500 uppercase mb-1 block">About Me</label>
+                                    <textarea id="inpBio" rows="3" class="w-full p-3 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600 outline-none focus:ring-2 focus:ring-medical dark:text-white text-sm" placeholder="I help students..."></textarea>
+                                </div>
+                                <div class="flex gap-4 mt-8 pt-4 border-t border-gray-100 dark:border-gray-700">
+                                    <button type="submit" class="flex-1 bg-medical hover:bg-green-700 text-white font-bold py-3 rounded-xl shadow-lg transition transform hover:scale-105">Save Changes</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+        
+        <div id="sidebarOverlay" class="fixed inset-0 bg-black/50 z-40 hidden md:hidden backdrop-blur-sm transition-opacity"></div>
+    </div>
+
+    <div id="videoModal" class="fixed inset-0 bg-black/90 z-50 hidden flex flex-col">
+        <div class="flex justify-between items-center p-4 bg-gray-900 text-white">
+            <h3 class="text-lg font-bold"><i class="fas fa-video mr-2"></i> Live Session</h3>
+            <button onclick="endVideoCall()" class="bg-red-600 hover:bg-red-700 px-4 py-2 rounded text-sm font-bold">End Call</button>
+        </div>
+        <div id="meet" class="flex-1 w-full h-full bg-gray-900"></div>
+    </div>
+
+    <script src="assets/js/counselor.js"></script>
+</body>
+</html>

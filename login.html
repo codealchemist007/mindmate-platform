@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MindMate - Login</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: { extend: { colors: { brand: '#6366f1' } } }
+        }
+    </script>
+</head>
+<body class="bg-gray-50 h-screen flex items-center justify-center font-sans">
+
+    <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md border border-gray-100 relative overflow-hidden">
+        
+        <div class="text-center mb-8 relative z-10">
+            <div class="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-brand/10 text-brand mb-4">
+                <i class="fas fa-brain text-2xl"></i>
+            </div>
+            <h2 id="formTitle" class="text-2xl font-bold text-gray-800">Welcome Back</h2>
+            <p class="text-gray-500 text-sm mt-1">Please enter your details to continue.</p>
+        </div>
+
+        <form id="authForm" onsubmit="handleAuth(event)" class="space-y-4 relative z-10">
+            
+            <div id="nameField" class="hidden">
+                <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Full Name</label>
+                <input type="text" id="name" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-brand">
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Email Address</label>
+                <input type="email" id="email" required class="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-brand">
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Password</label>
+                <input type="password" id="password" required class="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-brand">
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-gray-500 uppercase mb-1">I am a...</label>
+                <select id="role" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-brand">
+                    <option value="student">Student</option>
+                    <option value="counselor">Counselor</option>
+                </select>
+            </div>
+
+            <button type="submit" id="submitBtn" class="w-full bg-brand text-white font-bold py-3 rounded-lg hover:bg-indigo-600 transition shadow-lg">
+                Login
+            </button>
+        </form>
+
+        <div class="text-center mt-6">
+            <p class="text-sm text-gray-600">
+                <span id="toggleText">Don't have an account?</span>
+                <button onclick="toggleMode()" id="toggleBtn" class="text-brand font-bold hover:underline ml-1">Sign Up</button>
+            </p>
+        </div>
+        
+        <div class="text-center mt-4">
+            <a href="index.html" class="text-xs text-gray-400 hover:text-gray-600">Back to Home</a>
+        </div>
+    </div>
+
+    <script>
+        let isLogin = true;
+
+        function toggleMode() {
+            isLogin = !isLogin;
+            const title = document.getElementById('formTitle');
+            const btn = document.getElementById('submitBtn');
+            const toggleText = document.getElementById('toggleText');
+            const toggleBtn = document.getElementById('toggleBtn');
+            const nameField = document.getElementById('nameField');
+
+            if (isLogin) {
+                title.innerText = "Welcome Back";
+                btn.innerText = "Login";
+                toggleText.innerText = "Don't have an account?";
+                toggleBtn.innerText = "Sign Up";
+                nameField.classList.add('hidden');
+                document.getElementById('name').required = false;
+            } else {
+                title.innerText = "Create Account";
+                btn.innerText = "Sign Up";
+                toggleText.innerText = "Already have an account?";
+                toggleBtn.innerText = "Login";
+                nameField.classList.remove('hidden');
+                document.getElementById('name').required = true;
+            }
+        }
+
+        async function handleAuth(e) {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const role = document.getElementById('role').value;
+            const name = document.getElementById('name').value;
+
+            const endpoint = isLogin ? '/api/login' : '/api/signup';
+            const payload = isLogin ? { email, password, role } : { name, email, password, role };
+
+            try {
+                const res = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                
+                const data = await res.json();
+
+                if (data.status === 'ok') {
+                    // Success! Redirect based on role
+                    if (role === 'counselor') {
+                        
+
+                       window.location.href = `counselor.html?user=${encodeURIComponent(data.name || 'Dr. Counselor')}`;
+                    } else {
+                        // Pass user name via URL for the dashboard to pick up
+                        window.location.href = `dashboard.html?user=${encodeURIComponent(data.name || 'User')}`;
+                    }
+                } else {
+                    alert(data.error || 'Authentication failed');
+                }
+            } catch (err) {
+                alert('Server error. Make sure server.js is running.');
+            }
+        }
+        
+        // Check URL params to auto-select role
+        const urlParams = new URLSearchParams(window.location.search);
+        if(urlParams.get('role') === 'counselor') {
+            document.getElementById('role').value = 'counselor';
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MindMate - Student Dashboard</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: { 
+                extend: { 
+                    colors: { 
+                        brand: { 
+                            light: '#a5b4fc', 
+                            DEFAULT: '#6366f1', 
+                            dark: '#4338ca' 
+                        } 
+                    },
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    animation: {
+                        'fade-in': 'fadeIn 0.5s ease-out',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0', transform: 'translateY(10px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        }
+                    }
+                } 
+            }
+        }
+    </script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src='https://meet.jit.si/external_api.js'></script>
+
+    <style>
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 20px; }
+        .dark .custom-scrollbar::-webkit-scrollbar-thumb { background-color: #4b5563; }
+        
+        /* Breathing Animation Classes */
+        .breath-transition { transition-property: all; transition-timing-function: ease-in-out; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 dark:bg-gray-900 dark:text-gray-100 font-sans overflow-hidden">
+
+    <div class="flex h-screen relative transition-all duration-300">
+        
+        <aside id="sidebar" class="bg-white dark:bg-gray-800 h-full shadow-2xl flex flex-col justify-between transition-all duration-300 absolute z-40 md:relative w-64 -translate-x-full md:translate-x-0">
+            <div>
+                <div class="p-6 flex items-center justify-between border-b border-gray-100 dark:border-gray-700 h-16">
+                    <div class="flex items-center space-x-2 overflow-hidden whitespace-nowrap">
+                        <i class="fas fa-brain text-brand text-2xl"></i>
+                        <span class="text-xl font-bold text-brand" id="sidebarTitle">MindMate</span>
+                    </div>
+                    <button id="closeSidebarMobile" class="md:hidden text-gray-500 hover:text-red-500"><i class="fas fa-times"></i></button>
+                </div>
+                
+                <nav class="mt-6 px-4 space-y-2">
+                    <button onclick="switchTab('overview')" class="nav-btn w-full flex items-center p-3 rounded-lg text-brand bg-indigo-50 dark:bg-gray-700 dark:text-white transition-all whitespace-nowrap overflow-hidden group">
+                        <i class="fas fa-chart-pie w-6 min-w-[24px]"></i> 
+                        <span class="font-medium ml-3 group-hover:translate-x-1 transition-transform">Overview</span>
+                    </button>
+                    
+                    <button onclick="switchTab('tracker')" class="nav-btn w-full flex items-center p-3 rounded-lg text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700 transition-all whitespace-nowrap overflow-hidden group">
+                        <i class="fas fa-book-medical w-6 min-w-[24px]"></i> 
+                        <span class="font-medium ml-3 group-hover:translate-x-1 transition-transform">Daily Tracker</span>
+                    </button>
+                    
+                    <button onclick="switchTab('chat')" class="nav-btn w-full flex items-center p-3 rounded-lg text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700 transition-all whitespace-nowrap overflow-hidden group">
+                        <i class="fas fa-comments w-6 min-w-[24px]"></i> 
+                        <span class="font-medium ml-3 group-hover:translate-x-1 transition-transform">AI Chat</span>
+                    </button>
+                    
+                    <button onclick="switchTab('counselor')" class="nav-btn w-full flex items-center p-3 rounded-lg text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700 transition-all whitespace-nowrap overflow-hidden group">
+                        <i class="fas fa-user-md w-6 min-w-[24px]"></i> 
+                        <span class="font-medium ml-3 group-hover:translate-x-1 transition-transform">Counselor</span>
+                    </button>
+
+                    <button onclick="switchTab('games')" class="nav-btn w-full flex items-center p-3 rounded-lg text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700 transition-all whitespace-nowrap overflow-hidden group">
+                        <i class="fas fa-spa w-6 min-w-[24px]"></i> 
+                        <span class="font-medium ml-3 group-hover:translate-x-1 transition-transform">Stress Relief</span>
+                    </button>
+
+                    <button onclick="switchTab('profile')" class="nav-btn w-full flex items-center p-3 rounded-lg text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700 transition-all whitespace-nowrap overflow-hidden group">
+                        <i class="fas fa-id-card w-6 min-w-[24px]"></i> 
+                        <span class="font-medium ml-3 group-hover:translate-x-1 transition-transform">My Profile</span>
+                    </button>
+                </nav>
+            </div>
+
+            <div class="p-4 border-t border-gray-100 dark:border-gray-700 whitespace-nowrap overflow-hidden">
+                <button id="themeToggle" class="flex items-center justify-center w-full bg-gray-100 dark:bg-gray-700 p-3 rounded-lg text-gray-600 dark:text-gray-200 hover:bg-gray-200 transition">
+                    <i class="fas fa-moon mr-2"></i> <span>Dark Mode</span>
+                </button>
+                
+                <button onclick="logout()" class="mt-3 flex items-center justify-center w-full text-red-500 hover:bg-red-50 p-3 rounded-lg transition">
+                    <i class="fas fa-sign-out-alt mr-2"></i> <span>Logout</span>
+                </button>
+            </div>
+        </aside>
+
+        <div class="flex-1 flex flex-col h-screen overflow-hidden relative w-full transition-all duration-300">
+            
+            <header class="bg-white dark:bg-gray-800 shadow-sm p-4 flex justify-between items-center h-16 z-20">
+                <div class="flex items-center">
+                    <button id="toggleSidebar" class="text-gray-600 dark:text-white mr-4 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-transform active:scale-95">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                    <h2 id="pageTitle" class="text-xl font-bold text-gray-800 dark:text-white">Dashboard</h2>
+                </div>
+                <button class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-full text-sm font-bold shadow-md animate-pulse transform hover:scale-105 transition">
+                    <i class="fas fa-phone-alt mr-2"></i> SOS
+                </button>
+            </header>
+
+            <main class="flex-1 overflow-y-auto p-6 relative w-full">
+                
+                <div id="tab-overview" class="tab-content space-y-6 fade-in">
+                    <div class="bg-gradient-to-r from-brand to-purple-600 rounded-2xl p-8 text-white shadow-lg">
+                        <h3 class="text-2xl font-bold mb-2">Welcome Back, <span id="userAliasDisplay">Friend</span>!</h3>
+                        <p class="opacity-90">"Every small step towards self-care is a victory."</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
+                            <h4 class="text-lg font-bold text-gray-700 dark:text-gray-200 mb-4">Mood Trend (Last 7 Days)</h4>
+                            <div class="h-64"><canvas id="moodChart"></canvas></div>
+                        </div>
+
+                        <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col">
+                            <div class="flex justify-between items-center mb-4">
+                                <h4 class="text-lg font-bold text-gray-700 dark:text-gray-200">Your Appointments</h4>
+                                <button onclick="loadAppointments()" class="text-sm text-brand hover:underline font-bold">
+                                    <i class="fas fa-sync-alt mr-1"></i> Refresh
+                                </button>
+                            </div>
+                            <div id="studentApptList" class="space-y-3 flex-1 overflow-y-auto max-h-64 custom-scrollbar">
+                                <div class="text-center py-8 text-gray-400">
+                                    <i class="fas fa-spinner fa-spin mb-2"></i>
+                                    <p class="text-sm">Loading status...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tab-tracker" class="tab-content hidden animate-fade-in w-full">
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        <div class="lg:col-span-1">
+                            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 border border-gray-100 dark:border-gray-700 h-full flex flex-col">
+                                <h3 class="font-bold text-xl text-gray-800 dark:text-white mb-2">Daily Journal</h3>
+                                <p class="text-gray-500 text-sm mb-4">Write your thoughts. Our AI will analyze your mood.</p>
+                                <form onsubmit="handleJournalSubmit(event)" class="flex-grow flex flex-col">
+                                    <textarea id="journalInput" class="w-full bg-gray-50 dark:bg-gray-700 border-none rounded-xl p-4 mb-4 focus:ring-2 focus:ring-brand resize-none h-80 text-gray-800 dark:text-white" placeholder="How are you feeling today? Pour your heart out..." required></textarea>
+                                    <div class="flex gap-3 mt-auto">
+                                        <button type="button" onclick="clearJournalInput()" class="flex-1 bg-gray-200 hover:bg-gray-300 dark:bg-gray-600 dark:hover:bg-gray-500 text-gray-700 dark:text-white font-bold py-3 rounded-xl transition"><i class="fas fa-eraser mr-2"></i> Clear</button>
+                                        <button type="submit" class="flex-[2] bg-brand hover:bg-indigo-700 text-white font-bold py-3 rounded-xl transition shadow-lg transform active:scale-95"><i class="fas fa-paper-plane mr-2"></i> Post</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                        <div class="lg:col-span-2">
+                            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 border border-gray-100 dark:border-gray-700 h-full flex flex-col">
+                                <div class="flex justify-between items-center mb-6">
+                                    <h3 class="font-bold text-xl text-gray-800 dark:text-white">Mood History</h3>
+                                    <div class="flex gap-3">
+                                        <button onclick="clearJournalHistory()" class="text-sm text-red-500 hover:text-red-700 font-semibold transition"><i class="fas fa-trash-alt mr-1"></i> Clear All</button>
+                                        <button onclick="loadJournalHistory()" class="text-sm text-brand hover:text-indigo-700 font-semibold transition"><i class="fas fa-sync-alt mr-1"></i> Refresh</button>
+                                    </div>
+                                </div>
+                                <div id="journalList" class="space-y-4 overflow-y-auto max-h-[600px] pr-2 custom-scrollbar">
+                                    <div class="text-center py-12 text-gray-400"><i class="fas fa-spinner fa-spin text-2xl mb-3"></i><p>Loading history...</p></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tab-chat" class="tab-content hidden fade-in h-full flex flex-col pb-4">
+                    <div class="flex-1 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col overflow-hidden">
+                        <div id="chatHistory" class="flex-1 p-6 overflow-y-auto space-y-4 custom-scrollbar">
+                            <div class="flex items-start">
+                                <div class="bg-gray-100 dark:bg-gray-700 p-4 rounded-2xl rounded-tl-none max-w-[80%] text-gray-700 dark:text-gray-200">Hello! I'm MindMate AI. How are you feeling?</div>
+                            </div>
+                        </div>
+                        <div class="p-4 bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700">
+                            <div class="flex items-center bg-white dark:bg-gray-800 rounded-full border px-4 py-2 shadow-sm">
+                                <input type="text" id="chatInput" class="flex-1 bg-transparent border-none outline-none px-2 dark:text-white" placeholder="Type here...">
+                                <button onclick="sendMessage()" class="text-brand p-2"><i class="fas fa-paper-plane text-xl"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tab-counselor" class="tab-content hidden fade-in space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 p-6 rounded-xl">
+                            <div class="flex items-center space-x-4 mb-4">
+                                <div class="bg-red-100 text-red-600 p-3 rounded-full"><i class="fas fa-exclamation-triangle text-xl"></i></div>
+                                <h3 class="text-xl font-bold text-red-700 dark:text-red-400">Immediate Crisis?</h3>
+                            </div>
+                            <p class="text-gray-600 dark:text-gray-300 mb-4">If you are in danger, please contact emergency services immediately.</p>
+                            <button class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-lg shadow-md transition">Call National Helpline (14416)</button>
+                        </div>
+                        <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
+                            <h3 class="text-xl font-bold text-gray-800 dark:text-white mb-4">Book a Session</h3>
+                            <div class="space-y-4">
+                                <input id="apptTopic" type="text" placeholder="Topic (e.g., Anxiety, Stress)" class="w-full p-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg outline-none focus:ring-2 focus:ring-brand dark:text-white">
+                                <select id="counselorSelect" class="w-full p-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg outline-none focus:ring-2 focus:ring-brand dark:text-white">
+                                    <option value="" disabled selected>Select a Counselor</option>
+                                </select>
+                                <button onclick="bookSession()" class="w-full bg-brand hover:bg-brand-dark text-white font-bold py-3 rounded-lg shadow-lg transition">Request Appointment</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-8">
+                        <h3 class="text-xl font-bold text-gray-800 dark:text-white mb-4">Available Counselors</h3>
+                        <div id="counselorList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            <div class="col-span-full text-center py-10 text-gray-400"><i class="fas fa-spinner fa-spin mr-2"></i> Loading professionals...</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tab-games" class="tab-content hidden fade-in w-full h-full">
+                    <div class="flex flex-col items-center justify-center w-full min-h-[calc(100vh-100px)] text-center">
+                        <div class="mb-12">
+                            <h2 class="text-4xl font-bold text-gray-800 dark:text-white mb-2">Zen Zone</h2>
+                            <p class="text-lg text-gray-500 dark:text-gray-400">Interactive 4-7-8 Breathing Technique</p>
+                        </div>
+                        <div class="relative flex items-center justify-center mb-12">
+                            <div id="breathCircleOuter" class="absolute w-80 h-80 bg-blue-500/20 rounded-full blur-3xl transition-all duration-1000 scale-75 breath-transition"></div>
+                            <div id="breathCircle" class="w-64 h-64 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full shadow-2xl flex items-center justify-center z-10 transition-all duration-1000 transform scale-100 breath-transition">
+                                <span id="breathText" class="text-white text-3xl font-bold tracking-widest">Ready</span>
+                            </div>
+                        </div>
+                        <div class="space-y-6">
+                            <p id="breathInstruction" class="text-2xl text-gray-700 dark:text-gray-300 font-medium h-10 transition-all">Press Start to begin...</p>
+                            <button id="breathBtn" onclick="toggleBreathing()" class="px-10 py-4 bg-gray-900 dark:bg-white dark:text-gray-900 text-white font-bold text-lg rounded-full shadow-xl hover:scale-105 hover:shadow-2xl transition transform">Start Session</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tab-profile" class="tab-content hidden fade-in w-full h-full p-6">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 h-full max-w-6xl mx-auto">
+                        
+                        <div class="md:col-span-1 bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 p-6 flex flex-col items-center text-center h-fit">
+                            <div class="relative mb-4 group">
+                                <img id="profileAvatar" src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" class="w-40 h-40 rounded-full border-4 border-white dark:border-gray-700 shadow-xl bg-gray-100 object-cover">
+                                <button onclick="randomizeAvatar()" class="absolute bottom-2 right-2 bg-brand hover:bg-brand-dark text-white p-3 rounded-full shadow-lg transition transform hover:scale-110" title="Randomize">
+                                    <i class="fas fa-sync-alt"></i>
+                                </button>
+                            </div>
+                            <h2 id="displayFullname" class="text-2xl font-bold text-gray-800 dark:text-white mb-1">Student Name</h2>
+                            <p id="userAliasDisplay" class="text-brand font-medium mb-6">@student_alias</p>
+                            <div class="w-full bg-red-50 dark:bg-red-900/20 rounded-xl p-4 border border-red-100 dark:border-red-800">
+                                <p class="text-red-600 dark:text-red-400 text-xs font-bold uppercase mb-2">Emergency?</p>
+                                <button class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 rounded-lg text-sm shadow-md transition">Call 14416</button>
+                            </div>
+                        </div>
+
+                        <div class="md:col-span-2 bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 p-8 h-fit">
+                            <div class="flex justify-between items-center mb-6 border-b border-gray-100 dark:border-gray-700 pb-4">
+                                <h3 class="text-xl font-bold text-gray-800 dark:text-white"><i class="fas fa-user-edit mr-2 text-brand"></i> Edit Profile</h3>
+                                <span class="text-xs text-gray-400">All changes auto-save</span>
+                            </div>
+                            <form onsubmit="event.preventDefault(); saveProfile();">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
+                                    <div>
+                                        <label class="text-xs font-bold text-gray-500 uppercase">Full Name</label>
+                                        <input id="inpName" type="text" class="w-full p-2.5 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600 outline-none focus:ring-2 focus:ring-brand dark:text-white text-sm">
+                                    </div>
+                                    <div>
+                                        <label class="text-xs font-bold text-gray-500 uppercase">Email</label>
+                                        <input id="inpEmail" type="email" class="w-full p-2.5 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600 outline-none focus:ring-2 focus:ring-brand dark:text-white text-sm">
+                                    </div>
+                                    <div>
+                                        <label class="text-xs font-bold text-gray-500 uppercase">Phone</label>
+                                        <input id="inpPhone" type="tel" class="w-full p-2.5 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600 outline-none focus:ring-2 focus:ring-brand dark:text-white text-sm" placeholder="+91...">
+                                    </div>
+                                    <div>
+                                        <label class="text-xs font-bold text-gray-500 uppercase">Gender</label>
+                                        <select id="inpGender" class="w-full p-2.5 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600 outline-none focus:ring-2 focus:ring-brand dark:text-white text-sm">
+                                            <option>Male</option>
+                                            <option>Female</option>
+                                            <option>Prefer not to say</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="mb-6">
+                                    <label class="text-xs font-bold text-gray-500 uppercase">Mental Health Goal</label>
+                                    <textarea id="inpBio" rows="2" class="w-full p-2.5 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600 outline-none focus:ring-2 focus:ring-brand dark:text-white text-sm" placeholder="I want to feel..."></textarea>
+                                </div>
+                                <div class="flex gap-4 mt-8 pt-4 border-t border-gray-100 dark:border-gray-700">
+                                    <button type="submit" class="flex-1 bg-brand hover:bg-brand-dark text-white font-bold py-3 rounded-xl shadow-lg transition transform hover:scale-105">Save Changes</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <div id="videoModal" class="fixed inset-0 bg-black/90 z-50 hidden flex flex-col">
+        <div class="flex justify-between items-center p-4 bg-gray-900 text-white">
+            <h3 class="text-lg font-bold"><i class="fas fa-video mr-2"></i> Live Session</h3>
+            <button onclick="endVideoCall()" class="bg-red-600 hover:bg-red-700 px-4 py-2 rounded text-sm font-bold">End Call</button>
+        </div>
+        <div id="meet" class="flex-1 w-full h-full bg-gray-900"></div>
+    </div>
+
+    <script src="assets/js/dashboard.js"></script>
+</body>
+</html>
