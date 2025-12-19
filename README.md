@@ -22,7 +22,8 @@ graph TD
     Server -->|Read/Write| DB[(MongoDB Atlas)]
     Server -->|AI Chat| Gemini[Google Gemini API]
     Client -->|Video Call| Jitsi[Jitsi Meet API]
-    Server -->|Sentiment Analysis| SentimentLib[Sentiment.js]```
+    Server -->|Sentiment Analysis| SentimentLib[Sentiment.js]
+```
 
 ## Key Features
 
