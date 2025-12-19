@@ -1,8 +1,7 @@
 # MindMate Platform
 > **Your Safe Space for Mental Wellness.**
-[![Ask DeepWiki](https://devin.ai/assets/askdeepwiki.png)](https://deepwiki.com/codealchemist007/mindmate-platform)
 
-[![Live Demo](https://img.shields.io/badge/Live-Demo-brightgreen?style=for-the-badge&logo=render)](YOUR_RENDER_LINK_HERE) 
+[![Live Demo](https://img.shields.io/badge/Live-Demo-brightgreen?style=for-the-badge&logo=render)](https://mindmate-platform.onrender.com/)
 [![Tech Stack](https://img.shields.io/badge/Tech-Stack-Node.js%20%7C%20Express%20%7C%20MongoDB-blue?style=for-the-badge)](https://nodejs.org/)
 
 MindMate is a full-stack mental health platform that bridges the gap between students and professional counselors. It features an AI-driven emotional support companion, daily mood tracking, and a seamless video consultation system.
@@ -10,7 +9,7 @@ MindMate is a full-stack mental health platform that bridges the gap between stu
 ---
 
 ## 🚀 Live Demo
-**Access the platform here:** [🔗 **https://mindmate-platform.onrender.com**](https://mindmate-platform.onrender.com/)
+**Access the platform here:** **🔗**[**https://mindmate-platform.onrender.com**](https://mindmate-platform.onrender.com/)
 
 ---
 
@@ -133,10 +132,10 @@ The `server.js` file exposes the following RESTful API endpoints:
 | `POST` | `/api/chat`              | Sends a message to the Google Gemini AI chatbot.  |
 
 ## Login Credentials (Demo)
-| Role       | Email                    | Password     |
-|--------    |--------------------------|--------------|
-| `Student`  | `student@example.com`    | pass.        |
-| `Counselor`| `counselor@example.com`  | pass.        |
+| Role       | Email                    | Password           |
+|--------    |--------------------------|--------------------|
+| `Student`  | `student@example.com`    | password123        |
+| `Counselor`| `counselor@example.com`  | password123        |
 
 ## Project Structure
 
@@ -163,5 +162,5 @@ mindmate-platform/
 ├── login.html                # Login and signup page UI
 ├── package.json              # Backend dependencies and scripts
 └── server.js                 # Express.js backend server and API logic
-
+```
 Made with ❤️ for Mental Health Awareness
