@@ -18,7 +18,7 @@ MindMate is a full-stack mental health platform that bridges the gap between stu
 
 ```mermaid
 graph TD
-    Client[Client (Browser)] -->|HTTP Requests| Server[Node.js + Express Server]
+    Client["Client (Browser)"] -->|HTTP Requests| Server[Node.js + Express Server]
     Server -->|Read/Write| DB[(MongoDB Atlas)]
     Server -->|AI Chat| Gemini[Google Gemini API]
     Client -->|Video Call| Jitsi[Jitsi Meet API]
@@ -163,3 +163,5 @@ mindmate-platform/
 ├── login.html                # Login and signup page UI
 ├── package.json              # Backend dependencies and scripts
 └── server.js                 # Express.js backend server and API logic
+
+Made with ❤️ for Mental Health Awareness
